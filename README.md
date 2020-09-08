@@ -11,31 +11,31 @@ $ npm install -s dappeteer
 ## Usage
 
 ```js
-import puppeteer from 'puppeteer'
-import dappeteer from 'dappeteer'
+import puppeteer from "puppeteer";
+import dappeteer from "dappeteer";
 
 async function main() {
-  const browser = await dappeteer.launch(puppeteer)
-  const metamask = await dappeteer.getMetamask(browser)
+  const browser = await dappeteer.launch(puppeteer);
+  const metamask = await dappeteer.getMetamask(browser);
 
   // create or import an account
   // await metamask.createAccount()
-  await metamask.importAccount('already turtle birth enroll since...')
+  await metamask.importAccount("already turtle birth enroll since...");
 
   // you can change the network if you want
-  await metamask.switchNetwork('ropsten')
+  await metamask.switchNetwork("ropsten");
 
   // go to a dapp and do something that prompts MetaMask to confirm a transaction
-  const page = await browser.newPage()
-  await page.goto('http://my-dapp.com')
-  const payButton = await page.$('#pay-with-eth')
-  await payButton.click()
+  const page = await browser.newPage();
+  await page.goto("http://my-dapp.com");
+  const payButton = await page.$("#pay-with-eth");
+  await payButton.click();
 
   // 🏌
-  await metamask.confirmTransaction()
+  await metamask.confirmTransaction();
 }
 
-main()
+main();
 ```
 
 ## API
@@ -44,7 +44,7 @@ main()
 
   - `metamaskPath`: Path to the MetaMask extension (by default it uses the one bundled)
 
-  - `extensionUrl`: URL of the MetaMask extension, by default it is `chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/popup.html` but if you use a different version you might need to change it use the right extension id.
+  - `extensionUrl`: URL of the MetaMask extension, by default it is `chrome-extension://nhobmcdohlnjahocehianmmnhnlibfdo/popup.html` but if you use a different version you might need to change it use the right extension id.
 
 - `dappeteer.getMetaMask(browser)`: returns a promise that resolves to an object that allows you to interact with MetaMask by using the following methods:
 
@@ -67,5 +67,5 @@ main()
   - `metamask.confirmTransaction([{ gas, gasLimit }])`: commands MetaMask to submit a transaction. For this to work MetaMask has to be in a transaction confirmation state (basically promting the user to submit/reject a transaction). You can (optionally) pass an object with `gas` and/or `gasLimit`, by default they are `20` and `50000` respectively.
 
   - `metamask.sign()`: commands MetaMask to sign a message. For this to work MetaMask must be in a sign confirmation state.
-  
+
   - `metamask.approve()`: enables the app to connect to MetaMask account in privacy mode
