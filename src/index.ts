@@ -81,7 +81,7 @@ export async function getMetamask(
 
   let signedIn = true;
 
-  metamaskPage.close()
+  await metamaskPage.close()
 
   return {
     lock: async () => {
@@ -89,9 +89,9 @@ export async function getMetamask(
         throw new Error("You can't sign out because you haven't signed in yet");
       }
       await metamaskPage.bringToFront();
-      const accountSwitcher = await metamaskPage.waitFor(".identicon");
+      const accountSwitcher = await metamaskPage.waitForSelector(".identicon");
       await accountSwitcher.click();
-      const signoutButton = await metamaskPage.waitFor(
+      const signoutButton = await metamaskPage.waitForSelector(
         ".account-menu__logout-button"
       );
       await signoutButton.click();
@@ -103,10 +103,10 @@ export async function getMetamask(
       const popup = await goToMetamaskPopup(browser, options.extensionId, options.extensionUrl)
       await popup.bringToFront();
 
-      const nextButton = await popup.waitFor(".btn-primary");
+      const nextButton = await popup.waitForSelector(".btn-primary");
       await nextButton.click();
 
-      const connectButton = await popup.waitFor(".btn-primary");
+      const connectButton = await popup.waitForSelector(".btn-primary");
       await connectButton.click();
 
       await popup.close();
@@ -117,9 +117,9 @@ export async function getMetamask(
         throw new Error("You can't sign in because you are already signed in");
       }
       await metamaskPage.bringToFront();
-      const passwordBox = await metamaskPage.waitFor("#password");
+      const passwordBox = await metamaskPage.waitForSelector("#password");
       await passwordBox.type(password);
-      const login = await metamaskPage.waitFor(".unlock-page button");
+      const login = await metamaskPage.waitForSelector(".unlock-page button");
       await login.click();
       await waitForUnlockedScreen(metamaskPage);
       signedIn = true;
@@ -127,9 +127,9 @@ export async function getMetamask(
 
     addNetwork: async (url) => {
       await metamaskPage.bringToFront();
-      const networkSwitcher = await metamaskPage.waitFor(".network-indicator");
+      const networkSwitcher = await metamaskPage.waitForSelector(".network-indicator");
       await networkSwitcher.click();
-      await metamaskPage.waitFor("li.dropdown-menu-item");
+      await metamaskPage.waitForSelector("li.dropdown-menu-item");
       const networkIndex = await metamaskPage.evaluate((network) => {
         const elements = document.querySelectorAll("li.dropdown-menu-item");
         for (let i = 0; i < elements.length; i++) {
@@ -148,13 +148,13 @@ export async function getMetamask(
         networkIndex
       ];
       await networkButton.click();
-      const newRPCInput = await metamaskPage.waitFor("input#new-rpc");
+      const newRPCInput = await metamaskPage.waitForSelector("input#new-rpc");
       await newRPCInput.type(url);
-      const saveButton = await metamaskPage.waitFor(
+      const saveButton = await metamaskPage.waitForSelector(
         "button.settings-tab__rpc-save-button"
       );
       await saveButton.click();
-      const prevButton = await metamaskPage.waitFor(
+      const prevButton = await metamaskPage.waitForSelector(
         "img.app-header__metafox-logo"
       );
       await prevButton.click();
@@ -163,24 +163,24 @@ export async function getMetamask(
 
     importPK: async (pk) => {
       await metamaskPage.bringToFront();
-      const accountSwitcher = await metamaskPage.waitFor(".identicon");
+      const accountSwitcher = await metamaskPage.waitForSelector(".identicon");
       await accountSwitcher.click();
-      const addAccount = await metamaskPage.waitFor(
+      const addAccount = await metamaskPage.waitForSelector(
         ".account-menu > div:nth-child(7)"
       );
       await addAccount.click();
-      const PKInput = await metamaskPage.waitFor("input#private-key-box");
+      const PKInput = await metamaskPage.waitForSelector("input#private-key-box");
       await PKInput.type(pk);
-      const importButton = await metamaskPage.waitFor("button.btn-secondary");
+      const importButton = await metamaskPage.waitForSelector("button.btn-secondary");
       await importButton.click();
       await waitForUnlockedScreen(metamaskPage);
     },
 
     switchAccount: async (accountNumber) => {
       await metamaskPage.bringToFront();
-      const accountSwitcher = await metamaskPage.waitFor(".identicon");
+      const accountSwitcher = await metamaskPage.waitForSelector(".identicon");
       await accountSwitcher.click();
-      const account = await metamaskPage.waitFor(
+      const account = await metamaskPage.waitForSelector(
         `.account-menu__accounts > div:nth-child(${accountNumber})`
       );
       await account.click();
@@ -189,9 +189,9 @@ export async function getMetamask(
 
     switchNetwork: async (network = "main") => {
       await metamaskPage.bringToFront();
-      const networkSwitcher = await metamaskPage.waitFor(".network-indicator");
+      const networkSwitcher = await metamaskPage.waitForSelector(".network-indicator");
       await networkSwitcher.click();
-      await metamaskPage.waitFor("li.dropdown-menu-item");
+      await metamaskPage.waitForSelector("li.dropdown-menu-item");
       const networkIndex = await metamaskPage.evaluate((network) => {
         const elements = document.querySelectorAll("li.dropdown-menu-item");
         for (let i = 0; i < elements.length; i++) {
@@ -219,24 +219,24 @@ export async function getMetamask(
         throw new Error("You haven't signed in yet");
       }
 
-      await metamaskPage.waitFor(
+      await metamaskPage.waitForSelector(
         ".transaction-list__pending-transactions .transaction-list-item .transaction-status--unapproved"
       );
       await metamaskPage.reload();
 
       if (options) {
         const editButtonSelector = "div.confirm-detail-row__header-text--edit";
-        const editButton = await metamaskPage.waitFor(editButtonSelector);
+        const editButton = await metamaskPage.waitForSelector(editButtonSelector);
         await editButton.click();
 
         const tabSelector = "li.page-container__tab:nth-child(2)";
-        const tab = await metamaskPage.waitFor(tabSelector);
+        const tab = await metamaskPage.waitForSelector(tabSelector);
         await tab.click();
 
         if (options.gas) {
           const gasSelector =
             ".advanced-gas-inputs__gas-edit-row:nth-child(1) input";
-          const gas = await metamaskPage.waitFor(gasSelector);
+          const gas = await metamaskPage.waitForSelector(gasSelector);
 
           await metamaskPage.evaluate(
             () =>
@@ -250,7 +250,7 @@ export async function getMetamask(
         if (options.gasLimit) {
           const gasLimitSelector =
             ".advanced-gas-inputs__gas-edit-row:nth-child(2) input";
-          const gasLimit = await metamaskPage.waitFor(gasLimitSelector);
+          const gasLimit = await metamaskPage.waitForSelector(gasLimitSelector);
 
           await metamaskPage.evaluate(
             () =>
@@ -263,15 +263,15 @@ export async function getMetamask(
 
         const saveSelector =
           "#app-content > div > span > div.modal > div > div > div > div.page-container__bottom > div.page-container__footer > header > button";
-        const saveButton = await metamaskPage.waitFor(saveSelector);
+        const saveButton = await metamaskPage.waitForSelector(saveSelector);
         await saveButton.click();
 
         //Wait for modal to disappear
-        await metamaskPage.waitFor(() => !document.querySelector("div.modal"));
+        await metamaskPage.waitForFunction(() => !document.querySelector("div.modal"));
       }
       const confirmButtonSelector =
         "#app-content > div > div.main-container-wrapper > div > div.page-container__footer > header > button.button.btn-primary.btn--large.page-container__footer-button";
-      const confirmButton = await metamaskPage.waitFor(confirmButtonSelector);
+      const confirmButton = await metamaskPage.waitForSelector(confirmButtonSelector);
       await confirmButton.click();
       await waitForUnlockedScreen(metamaskPage);
     },
@@ -284,7 +284,7 @@ export async function getMetamask(
       const popup = await goToMetamaskPopup(browser, options.extensionId, options.extensionUrl)
       await popup.bringToFront();
 
-      const signButton = await popup.waitFor(".btn-secondary");
+      const signButton = await popup.waitForSelector(".btn-secondary");
       await signButton.click();
 
       await popup.close();
@@ -296,7 +296,7 @@ export async function getMetamask(
       const confirmButtonSelector =
         "button.button.btn-primary.btn--large.page-container__footer-button";
 
-      const button = await metamaskPage.waitFor(confirmButtonSelector);
+      const button = await metamaskPage.waitForSelector(confirmButtonSelector);
       await button.click();
 
       await waitForUnlockedScreen(metamaskPage);
@@ -340,7 +340,7 @@ async function goToMetamaskWebPage(browser, extensionId, extensionUrl, htmlPage)
 }
 
 async function confirmWelcomeScreen(metamaskPage: puppeteer.Page) {
-  const continueButton = await metamaskPage.waitFor(".welcome-page button");
+  const continueButton = await metamaskPage.waitForSelector(".welcome-page button");
   await continueButton.click();
 }
 
@@ -349,31 +349,31 @@ async function importAccount(
   seed: string,
   password: string
 ) {
-  const importLink = await metamaskPage.waitFor(".first-time-flow button");
+  const importLink = await metamaskPage.waitForSelector(".first-time-flow button");
   await importLink.click();
 
-  const metricsOptOut = await metamaskPage.waitFor(
+  const metricsOptOut = await metamaskPage.waitForSelector(
     ".metametrics-opt-in button.btn-primary"
   );
   await metricsOptOut.click();
 
-  const seedPhraseInput = await metamaskPage.waitFor(".MuiInputBase-input");
+  const seedPhraseInput = await metamaskPage.waitForSelector(".MuiInputBase-input");
   //class="MuiInputBase-input MuiInput-input"
   await seedPhraseInput.type(seed);
 
-  const passwordInput = await metamaskPage.waitFor("#password");
+  const passwordInput = await metamaskPage.waitForSelector("#password");
   await passwordInput.type(password);
 
-  const passwordConfirmInput = await metamaskPage.waitFor("#confirm-password");
+  const passwordConfirmInput = await metamaskPage.waitForSelector("#confirm-password");
   await passwordConfirmInput.type(password);
 
-  const acceptTerms = await metamaskPage.waitFor(".first-time-flow__terms");
+  const acceptTerms = await metamaskPage.waitForSelector(".first-time-flow__terms");
   await acceptTerms.click();
 
-  const restoreButton = await metamaskPage.waitFor(".first-time-flow button");
+  const restoreButton = await metamaskPage.waitForSelector(".first-time-flow button");
   await restoreButton.click();
 
-  const doneButton = await metamaskPage.waitFor(".end-of-flow button");
+  const doneButton = await metamaskPage.waitForSelector(".end-of-flow button");
   await doneButton.click();
 }
 
@@ -397,13 +397,13 @@ async function waitForEthereum(metamaskPage) {
 }
 
 async function waitUntilStartConnectingToEthereum(metamaskPage) {
-  await metamaskPage.waitFor(() => {
+  await metamaskPage.waitForSelector(() => {
     return !!document.querySelector('img[src="images/loading.svg"]');
   });
 }
 
 async function waitUntilConnectedToEthereum(metamaskPage) {
-  await metamaskPage.waitFor(() => {
+  await metamaskPage.waitForSelector(() => {
     return document.querySelector('img[src="images/loading.svg"]') == null;
   });
 }
