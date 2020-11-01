@@ -70,7 +70,6 @@ export async function getMetamask(
   options: MetamaskOptions = {}
 ): Promise<Dappeteer> {
   const metamaskPage = await closeHomeScreen(browser);
-  //const metamaskPage = await getMetamaskPage(browser, options.extensionId, options.extensionUrl)
   await confirmWelcomeScreen(metamaskPage);
 
   await importAccount(
@@ -82,7 +81,7 @@ export async function getMetamask(
 
   let signedIn = true;
 
-  closeNotificationPage(browser);
+  metamaskPage.close()
 
   return {
     lock: async () => {
@@ -101,25 +100,16 @@ export async function getMetamask(
     },
 
     connect: async () => {
-      let metamaskPage = await getMetamaskPage(
-        browser,
-        options.extensionId,
-        options.extensionUrl
-      );
-      await metamaskPage.bringToFront();
-      const nextButton = await metamaskPage.waitFor(".btn-primary");
-      nextButton.click();
-      await delay(5000);
-      console.log("delay passed");
-      // metamaskPage = await getMetamaskPage(
-      //   browser,
-      //   options.extensionId,
-      //   options.extensionUrl
-      // );
-      console.log("CNTNND");
-      const connectButton = await metamaskPage.waitFor(".btn-primary");
-      connectButton.click();
-      console.log(connectButton);
+      const popup = await goToMetamaskPopup(browser, options.extensionId, options.extensionUrl)
+      await popup.bringToFront();
+
+      const nextButton = await popup.waitFor(".btn-primary");
+      await nextButton.click();
+
+      const connectButton = await popup.waitFor(".btn-primary");
+      await connectButton.click();
+
+      await popup.close();
     },
 
     unlock: async (password = "password1234") => {
@@ -287,19 +277,17 @@ export async function getMetamask(
     },
 
     sign: async () => {
-      await metamaskPage.bringToFront();
       if (!signedIn) {
         throw new Error("You haven't signed in yet");
       }
-      await metamaskPage.reload();
 
-      const confirmButtonSelector =
-        ".request-signature__footer button.btn-secondary";
+      const popup = await goToMetamaskPopup(browser, options.extensionId, options.extensionUrl)
+      await popup.bringToFront();
 
-      const button = await metamaskPage.waitFor(confirmButtonSelector);
-      await button.click();
+      const signButton = await popup.waitFor(".btn-secondary");
+      await signButton.click();
 
-      await waitForUnlockedScreen(metamaskPage);
+      await popup.close();
     },
 
     approve: async () => {
@@ -333,24 +321,18 @@ async function closeHomeScreen(
   });
 }
 
-async function closeNotificationPage(browser: puppeteer.Browser) {
-  browser.on("targetcreated", async (target) => {
-    if (
-      target.url() ===
-      "chrome-extension://nhobmcdohlnjahocehianmmnhnlibfdo/notification.html"
-    ) {
-      try {
-        const page = await target.page();
-        await page.close();
-      } catch {}
-    }
-  });
+async function goToMetamaskPopup(browser, extensionId, extensionUrl) {
+  return goToMetamaskWebPage(browser, extensionId, extensionUrl, 'popup');
 }
 
-async function getMetamaskPage(browser, extensionId, extensionUrl) {
+async function goToMetamaskNotification(browser, extensionId, extensionUrl) {
+  return goToMetamaskWebPage(browser, extensionId, extensionUrl, 'notification');
+}
+
+async function goToMetamaskWebPage(browser, extensionId, extensionUrl, htmlPage) {
   const EXTENSION_ID = extensionId || "nhobmcdohlnjahocehianmmnhnlibfdo";
   const EXTENSION_URL =
-    extensionUrl || `chrome-extension://${EXTENSION_ID}/popup.html`;
+      extensionUrl || `chrome-extension://${EXTENSION_ID}/${htmlPage}.html`;
 
   const metamaskPage = await browser.newPage();
   await metamaskPage.goto(EXTENSION_URL);
