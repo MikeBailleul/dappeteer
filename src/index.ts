@@ -106,6 +106,9 @@ export async function getMetamask(
       const nextButton = await popup.waitForSelector(".btn-primary");
       await nextButton.click();
 
+      popup.waitForTimeout(5000)
+      console.log('Dappeteer, metamask popup: waiting a bit')
+
       const connectButton = await popup.waitForSelector(".btn-primary");
       await connectButton.click();
 
