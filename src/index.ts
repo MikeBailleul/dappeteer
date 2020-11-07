@@ -100,14 +100,13 @@ export async function getMetamask(
     },
 
     connect: async () => {
+      await delay(2500)
+
       const popup = await goToMetamaskPopup(browser, options.extensionId, options.extensionUrl)
       await popup.bringToFront();
 
       const nextButton = await popup.waitForSelector(".btn-primary");
       await nextButton.click();
-
-      popup.waitForTimeout(5000)
-      console.log('Dappeteer, metamask popup: waiting a bit')
 
       const connectButton = await popup.waitForSelector(".btn-primary");
       await connectButton.click();
@@ -283,6 +282,8 @@ export async function getMetamask(
       if (!signedIn) {
         throw new Error("You haven't signed in yet");
       }
+
+      await delay(2500)
 
       const popup = await goToMetamaskPopup(browser, options.extensionId, options.extensionUrl)
       await popup.bringToFront();
