@@ -47,7 +47,7 @@ export async function launch(
   const { args, ...rest } = options;
 
   const { metamaskVersion, metamaskPath } = options;
-  const METAMASK_VERSION = metamaskVersion || "8.0.9";
+  const METAMASK_VERSION = metamaskVersion || "8.1.11";
   console["log"](path.join(__dirname, `metamask/${METAMASK_VERSION}`));
   const METAMASK_PATH =
     metamaskPath || path.resolve(__dirname, "..", "metamask", METAMASK_VERSION);
@@ -334,7 +334,7 @@ async function goToMetamaskNotification(browser, extensionId, extensionUrl) {
 }
 
 async function goToMetamaskWebPage(browser, extensionId, extensionUrl, htmlPage) {
-  const EXTENSION_ID = extensionId || "nhobmcdohlnjahocehianmmnhnlibfdo";
+  const EXTENSION_ID = extensionId || "nkbihfbeogaeaoehlefnkodbefgpgknn";
   const EXTENSION_URL =
       extensionUrl || `chrome-extension://${EXTENSION_ID}/${htmlPage}.html`;
 
