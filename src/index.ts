@@ -33,6 +33,7 @@ export type Dappeteer = {
   sign: () => Promise<void>;
   approve: () => Promise<void>;
   connect: () => Promise<void>;
+  connectWithSignature: () => Promise<void>;
 };
 
 export type TransactionOptions = {
@@ -100,18 +101,12 @@ export async function getMetamask(
     },
 
     connect: async () => {
-      await delay(2500)
+      await attemptToConnect(browser, options);
+    },
 
-      const popup = await goToMetamaskPopup(browser, options.extensionId, options.extensionUrl)
-      await popup.bringToFront();
-
-      const nextButton = await popup.waitForSelector(".btn-primary");
-      await nextButton.click();
-
-      const connectButton = await popup.waitForSelector(".btn-primary");
-      await connectButton.click();
-
-      await popup.close();
+    connectWithSignature: async () => {
+      await attemptToConnect(browser, options);
+      await attemptToSign(browser, options);
     },
 
     unlock: async (password = "password1234") => {
@@ -283,15 +278,7 @@ export async function getMetamask(
         throw new Error("You haven't signed in yet");
       }
 
-      await delay(2500)
-
-      const popup = await goToMetamaskPopup(browser, options.extensionId, options.extensionUrl)
-      await popup.bringToFront();
-
-      const signButton = await popup.waitForSelector(".btn-secondary");
-      await signButton.click();
-
-      await popup.close();
+      await attemptToSign(browser, options)
     },
 
     approve: async () => {
@@ -379,6 +366,41 @@ async function importAccount(
 
   const doneButton = await metamaskPage.waitForSelector(".end-of-flow button");
   await doneButton.click();
+}
+
+async function attemptToConnect(browser, options) {
+  await delay(2500)
+
+  const popup = await goToMetamaskPopup(browser, options.extensionId, options.extensionUrl)
+  await popup.bringToFront();
+
+  try {
+    const nextButton = await popup.waitForSelector(".btn-primary", { timeout: 4000 });
+    await nextButton.click();
+
+    const connectButton = await popup.waitForSelector(".btn-primary", { timeout: 4000 });
+    await connectButton.click();
+  } catch {
+    console.warn('Connect button not found, probably already connected?')
+  } finally {
+    await popup.close();
+  }
+}
+
+async function attemptToSign(browser, options) {
+  await delay(2500)
+
+  const popup = await goToMetamaskPopup(browser, options.extensionId, options.extensionUrl)
+  await popup.bringToFront();
+
+  try {
+    const signButton = await popup.waitForSelector(".btn-secondary", { timeout: 4000 });
+    await signButton.click();
+  } catch (e) {
+    console.error(e)
+  } finally {
+    await popup.close();
+  }
 }
 
 async function waitForUnlockedScreen(metamaskPage) {
