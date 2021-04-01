@@ -2,6 +2,11 @@
 
 E2E testing for dApps using Puppeteer + MetaMask
 
+## Note
+
+To extract an extension, you can use:
+https://crxextractor.com/
+
 ## Installation
 
 ```
